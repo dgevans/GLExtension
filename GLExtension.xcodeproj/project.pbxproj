@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		61BF43E0137887AE00A54E9B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43DF137887AE00A54E9B /* main.cpp */; };
+		61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43E7137887C200A54E9B /* linearpoly.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +27,8 @@
 		61BF43DB137887AE00A54E9B /* GLExtension */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLExtension; sourceTree = BUILT_PRODUCTS_DIR; };
 		61BF43DF137887AE00A54E9B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		61BF43E1137887AE00A54E9B /* GLExtension.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLExtension.1; sourceTree = "<group>"; };
+		61BF43E7137887C200A54E9B /* linearpoly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linearpoly.cpp; sourceTree = "<group>"; };
+		61BF43E8137887C200A54E9B /* linearpoly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linearpoly.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 			children = (
 				61BF43DF137887AE00A54E9B /* main.cpp */,
 				61BF43E1137887AE00A54E9B /* GLExtension.1 */,
+				61BF43E7137887C200A54E9B /* linearpoly.cpp */,
+				61BF43E8137887C200A54E9B /* linearpoly.h */,
 			);
 			path = GLExtension;
 			sourceTree = "<group>";
@@ -112,6 +117,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61BF43E0137887AE00A54E9B /* main.cpp in Sources */,
+				61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,22 +159,36 @@
 		61BF43E5137887AE00A54E9B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Accelerate,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = /usr/include;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
 		61BF43E6137887AE00A54E9B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Accelerate,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = /usr/include;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
