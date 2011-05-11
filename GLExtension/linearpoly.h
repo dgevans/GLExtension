@@ -9,35 +9,44 @@
 #define LINEARPOLY_H_
 #include "armadillo"
 
-arma::imat computeTerms(int dim); 
+arma::umat computeTerms(int dim); 
 
 template <int d>
 class linearpoly {
     //contains the terms associated with a linear polynomial of dimension d
-    static arma::imat terms;
+    static arma::umat terms;
     
     //Specific to each instanciation
     arma::vec coef;
     arma::mat Ainv;//matrix to back out coeefficients from state.
     
-public:
     
-    linearpoly(arma::mat ainv, arma::vec f);
+public:
+    linearpoly(){};
+    linearpoly(const arma::mat &ainv);
+    linearpoly(const arma::mat &ainv, const arma::vec &f);
+    
+    void fit(const arma::vec &f){coef = Ainv*f;};
     //constructs the terms associated
     static void constructTerms(){terms = computeTerms(d);};
-    static const arma::imat& getTermMatrix(){return terms;}
     
-    double evaluate(arma::vec x);//evaluates the linear polynomial at (x_1,\ldots x_n)
+    static const arma::umat& getTermMatrix(){return terms;}
     
-    arma::rowvec Jacobian(arma::vec x);
+    double evaluate(const arma::vec &x);//evaluates the linear polynomial at (x_1,\ldots x_n)
     
-    static arma::rowvec getTermVector(arma::vec x);
+    arma::rowvec Jacobian(const arma::vec &x);
+    
+    static arma::rowvec getTermVector(const arma::vec &x);
+    
+    static arma::rowvec getSlopeTermVector(const arma::vec &x, int k);
+    
+    double getSlope(const arma::vec &x, int k);
 };
 
 
 
 template <int d>
-arma::rowvec linearpoly<d>::getTermVector(arma::vec x) {
+arma::rowvec linearpoly<d>::getTermVector(const arma::vec &x) {
     arma::rowvec linterms = arma::ones<arma::rowvec>(terms.n_rows);
     for (int i=0; i<terms.n_rows; i++) {
         for (int j=0; j<d; j++) {
@@ -49,23 +58,54 @@ arma::rowvec linearpoly<d>::getTermVector(arma::vec x) {
 }
 
 template <int d>
-linearpoly<d>::linearpoly(arma::mat ainv,arma::vec f):Ainv(ainv) {
-    if (Ainv.n_rows != terms.n_rows) {
-        std::cerr<<"Linear Poly: Ainv has the wrong number of elements"<<std::endl;
-        exit(1);
+arma::rowvec linearpoly<d>::getSlopeTermVector(const arma::vec &x, int k) {
+    arma::rowvec linterms = arma::ones<arma::rowvec>(terms.n_rows);
+    for (int i=0; i<terms.n_rows; i++) {
+        if(terms(i,k) ==0)
+            linterms(i) = 0;
+        else{
+            for (int j=0; j<d; j++) {
+                if( (terms(i,j) == 1)&& (j!= k) )
+                    linterms(i) *= x(j);
+            }
+        }
     }
-    coef = Ainv*f;
+    return linterms;
 }
 
 
 template <int d>
-double linearpoly<d>::evaluate(arma::vec x) {
+linearpoly<d>::linearpoly(const arma::mat &ainv,const arma::vec &f):Ainv(ainv) {
+    if (Ainv.n_rows != terms.n_rows) {
+        std::cerr<<"Linear Poly: Ainv has the wrong number of elements"<<std::endl;
+        exit(1);
+    }
+    fit(f);
+}
+
+template <int d>
+linearpoly<d>::linearpoly(const arma::mat &ainv):Ainv(ainv) {
+    if (Ainv.n_rows != terms.n_rows) {
+        std::cerr<<"Linear Poly: Ainv has the wrong number of elements"<<std::endl;
+        exit(1);
+    }
+}
+
+
+template <int d>
+double linearpoly<d>::evaluate(const arma::vec &x) {
     arma::mat ret = getTermVector(x)*coef; 
     return ret(0);
 }
 
 template <int d>
-arma::rowvec linearpoly<d>::Jacobian(arma::vec x) {
+double linearpoly<d>::getSlope(const arma::vec &x,int k) {
+    arma::mat ret = getSlopeTermVector(x,k)*coef; 
+    return ret(0);
+}
+
+template <int d>
+arma::rowvec linearpoly<d>::Jacobian(const arma::vec &x) {
     return getTermVector(x)*Ainv;
 }
 

@@ -9,12 +9,12 @@
 #include "linearpoly.h"
 using namespace arma;
 
-imat computeTerms(int dim)
+umat computeTerms(int dim)
 {
     int n = int(pow(2,dim));
-    imat termret = imat(n,dim);
+    umat termret(n,dim);
     if(dim !=1){
-        imat prevterms = computeTerms(dim-1);
+        umat prevterms = computeTerms(dim-1);
         for(int i =0; i<prevterms.n_rows; i++)
         {
             termret.submat(2*i, 0,2*i, dim-2) = prevterms.row(i);

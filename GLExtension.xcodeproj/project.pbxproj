@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		61965361137B1D20003901B2 /* Firm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6196535F137B1D20003901B2 /* Firm.cpp */; };
 		61BF43E0137887AE00A54E9B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43DF137887AE00A54E9B /* main.cpp */; };
 		61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43E7137887C200A54E9B /* linearpoly.cpp */; };
 /* End PBXBuildFile section */
@@ -24,6 +25,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		612BEB5F13798B98002649DC /* linearinterpolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linearinterpolator.h; sourceTree = "<group>"; };
+		6196535F137B1D20003901B2 /* Firm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Firm.cpp; sourceTree = "<group>"; };
+		61965360137B1D20003901B2 /* Firm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Firm.h; sourceTree = "<group>"; };
 		61BF43DB137887AE00A54E9B /* GLExtension */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLExtension; sourceTree = BUILT_PRODUCTS_DIR; };
 		61BF43DF137887AE00A54E9B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		61BF43E1137887AE00A54E9B /* GLExtension.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLExtension.1; sourceTree = "<group>"; };
@@ -65,6 +69,9 @@
 				61BF43E1137887AE00A54E9B /* GLExtension.1 */,
 				61BF43E7137887C200A54E9B /* linearpoly.cpp */,
 				61BF43E8137887C200A54E9B /* linearpoly.h */,
+				612BEB5F13798B98002649DC /* linearinterpolator.h */,
+				6196535F137B1D20003901B2 /* Firm.cpp */,
+				61965360137B1D20003901B2 /* Firm.h */,
 			);
 			path = GLExtension;
 			sourceTree = "<group>";
@@ -118,6 +125,7 @@
 			files = (
 				61BF43E0137887AE00A54E9B /* main.cpp in Sources */,
 				61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */,
+				61965361137B1D20003901B2 /* Firm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +219,7 @@
 				61BF43E6137887AE00A54E9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
