@@ -7,33 +7,39 @@
 //
 
 #include <iostream>
-#include "linearinterpolator.h"
+#include "Firm.h"
+#include "libscl.h"
+#include <math.h>
+#include <time.h>
 
 using namespace arma;
 
 template <int d> arma::umat linearpoly<d>::terms;
+const int firm::d;
 
 
 int main (int argc, const char * argv[])
 {
-    vec temp(2),x1(2),x2(2);
-    std::vector<vec> xnodes(2);
-    vec f(4);
-    mat A(4,4);
-    xnodes[0]<< 0.0 <<1.0<<endr;
-    xnodes[1]<< 0.0 <<1.0<<endr;
-    f<< 0.0 <<1.0<<2.0<<4.0<<endr;
-    linearpoly<2>::constructTerms();
-    linint<2> interp(xnodes);
-    interp.setf(f);
-    interp.fit();
-    temp << 0 << 1.0<<endr;
-    std::cout<<interp.Jacobian(temp)<<std::endl;
-    std::cout<<interp.getSlope(temp, 1)<<std::endl;
-    
     // insert code here...
+    double psi = 1;
+    double rho = pow(0.61,0.25);
+    double var_e = 0.0231*0.0231;
+    double var_u = sqrt(0.0018*0.0018/( (1+pow(rho,6))+(1+pow(rho,4))*pow((1+rho),2)+(1+pow(rho,2))*pow((1+rho+rho*rho),2)+pow((1+rho+rho*rho+rho*rho*rho),2)));
+    double gamma = 3;
+    double beta = pow(0.96,1.0/52.0)/exp(pow((gamma-1),2)*var_e/2);
+
+    double param[6] = {psi,beta,var_e,var_u,rho,gamma};
+    vec kap;
+    kap << 0.0167<<endr;
+    mat pi_k;
+    pi_k << 1.0<<endr;
+    vec reg;
+    reg << gamma/(1-gamma)<<0.0<<0.0;
+    
+    linearpoly<firm::d>::constructTerms();
+    firm F( param, kap, pi_k, reg);
+    F.solveBellman();
     return 0;
 }
-
 
 

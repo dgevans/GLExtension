@@ -169,15 +169,18 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_OPENMP_SUPPORT = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = "";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/libscl/gpp;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Accelerate,
+					"-lscl",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = /usr/include;
+				USER_HEADER_SEARCH_PATHS = "/usr/include /usr/local/lib/libscl/gpp";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -188,14 +191,17 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_OPENMP_SUPPORT = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = "";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/libscl/gpp;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Accelerate,
+					"-lscl",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = /usr/include;
+				USER_HEADER_SEARCH_PATHS = "/usr/include /usr/local/lib/libscl/gpp";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
