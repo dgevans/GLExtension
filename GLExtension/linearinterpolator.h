@@ -41,9 +41,9 @@ public:
     void setf(const arma::vec &f){fnodes = f;};
     //first to current values at fnodes
     void fit();
-    double eval(const arma::vec &x);//evaluates at location vector x.
+    double eval(const arma::vec &x) const;//evaluates at location vector x.
     
-    arma::rowvec Jacobian(const arma::vec &x) const;//finds the Jacobian w/ respect to fnodes at x
+    arma::uvec Jacobian(const arma::vec &x, arma::vec& Jacpoly) const;//finds the Jacobian w/ respect to fnodes at x
     
     //allows one to change f at node i
     double& f(int i){return fnodes(i);};
@@ -171,7 +171,7 @@ void linint<d>::fit()
 }
 
 template<int d>
-double linint<d>::eval(const arma::vec &x)
+double linint<d>::eval(const arma::vec &x) const
 {
     arma::uvec node = findNode(x);
     return polys[vecToInt(node)].evaluate(x);
@@ -185,24 +185,24 @@ double linint<d>::getSlope(const arma::vec &x,int i)
 } 
 
 template<int d>
-arma::rowvec linint<d>::Jacobian(const arma::vec &x) const
+arma::uvec linint<d>::Jacobian(const arma::vec &x, arma::vec &polyJac) const
 {
     //Setup
-    arma::rowvec Jac = arma::zeros<arma::rowvec>(length());
     const arma::umat& terms = linearpoly<d>::getTermMatrix();
     //Find the node corresponding to x
     int node = vecToInt(findNode(x));
     //Get the Jacobian in polyspace at x
-    arma::rowvec polyJac = polys[node].Jacobian(x);
+    polyJac = arma::trans(polys[node].Jacobian(x));
     //get the node for which the fit is made
     arma::uvec ncoord = intToVecBoundry(node);
     //convert jacobian to the interp space.
     int nterms = terms.n_rows;
+    arma::uvec index(nterms);
     for(int i=0; i<nterms; i++)
     {
-        Jac(vecToInt(ncoord+arma::trans(terms.row(i)))) = polyJac(i);
+        index(i) = vecToInt(ncoord+arma::trans(terms.row(i)));
     }
-    return Jac;
+    return index;
 } 
 
 template<int d>

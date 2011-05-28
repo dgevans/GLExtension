@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6121347513821C06005184EE /* Economy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6121347313821C06005184EE /* Economy.cpp */; };
 		61965361137B1D20003901B2 /* Firm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6196535F137B1D20003901B2 /* Firm.cpp */; };
 		61BF43E0137887AE00A54E9B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43DF137887AE00A54E9B /* main.cpp */; };
 		61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61BF43E7137887C200A54E9B /* linearpoly.cpp */; };
@@ -25,6 +26,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6121347313821C06005184EE /* Economy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Economy.cpp; sourceTree = "<group>"; };
+		6121347413821C06005184EE /* Economy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Economy.h; sourceTree = "<group>"; };
 		612BEB5F13798B98002649DC /* linearinterpolator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linearinterpolator.h; sourceTree = "<group>"; };
 		6196535F137B1D20003901B2 /* Firm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Firm.cpp; sourceTree = "<group>"; };
 		61965360137B1D20003901B2 /* Firm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Firm.h; sourceTree = "<group>"; };
@@ -66,6 +69,8 @@
 			isa = PBXGroup;
 			children = (
 				61BF43DF137887AE00A54E9B /* main.cpp */,
+				6121347313821C06005184EE /* Economy.cpp */,
+				6121347413821C06005184EE /* Economy.h */,
 				61BF43E1137887AE00A54E9B /* GLExtension.1 */,
 				61BF43E7137887C200A54E9B /* linearpoly.cpp */,
 				61BF43E8137887C200A54E9B /* linearpoly.h */,
@@ -126,6 +131,7 @@
 				61BF43E0137887AE00A54E9B /* main.cpp in Sources */,
 				61BF43E9137887C200A54E9B /* linearpoly.cpp in Sources */,
 				61965361137B1D20003901B2 /* Firm.cpp in Sources */,
+				6121347513821C06005184EE /* Economy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +179,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = /usr/local/boost_1_45_0;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/libscl/gpp;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -194,6 +201,7 @@
 				ENABLE_OPENMP_SUPPORT = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = /usr/local/boost_1_45_0;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/libscl/gpp;
 				OTHER_LDFLAGS = (
 					"-framework",

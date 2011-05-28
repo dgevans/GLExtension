@@ -13,9 +13,9 @@ class firm {
 public:
     //some constants
     static const int d = 3;//Size of interpolators used
-    static const int N_Qu = 15;//number of nodes for quadrature for u shock.
+    static const int N_Qu = 40;//number of nodes for quadrature for u shock.
     static const int N_Qe = 20;//number of nodes for quadrature for e shock.
-    static const int N_mu = 25;
+    static const int N_mu = 50;
     static const int N_g = 7;
     static const int N_p = 7;
     static const double pbound = 0.015;
@@ -35,6 +35,8 @@ private:
     double sigma_u;
     double rho; //persistance of the money shock
     double gamma;//Elasticity of substitution
+    double mu_min;
+    double mu_max;
     
     //Menu cost process
     arma::vec kappa;
@@ -76,13 +78,17 @@ private:
     std::pair<double,double> findOptimalMu(std::pair<double,double> x, int k);//Find the optimal mu given x =(g_t,p_{t-1}), return <mu,value>
     double getPresentValue(arma::vec &x, int k);
     
-    void getPolicy();
+    void computePolicy();
     
 public:
     //Solves the Bellman equations
     void solveBellman();
     
     firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arma::vec &reg);
+    
+    double getPolicy(arma::vec x,int i) const;
+    
+    arma::vec& creg() {return c_reg;};
 };
 
 

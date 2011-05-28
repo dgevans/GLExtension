@@ -32,9 +32,9 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     psi = param[0];
     beta = param[1];
     var_e = param[2];
+    var_u = param[3];
     sigma_e = sqrt(var_e);
     sigma_u = sqrt(var_u);
-    var_u = param[3];
     rho = param[4];
     gamma = param[5];
     n_k = kappa.n_cols;
@@ -70,8 +70,8 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
 
     //Setup grids
     //bounds on mu
-    double mu_min = exp(e_u.min())*gamma/(gamma-1)*.65;
-    double mu_max = exp(e_u.max())*gamma/(gamma-1)*1.35;
+    mu_min = exp(e_u.min())*gamma/(gamma-1)*.15;
+    mu_max = exp(e_u.max())*gamma/(gamma-1)*2;
     //bounds on g_t
     double g_max = 3*(sigma_e)/sqrt(1-rho*rho);
     double g_min = -3*(sigma_e)/sqrt(1-rho*rho);
@@ -146,7 +146,7 @@ void firm::solveBellman()
         setf(fnew);
         cout<<norm(diff,"inf")<<endl;
     }
-    getPolicy();
+    computePolicy();
 }
 
 /*
@@ -185,8 +185,12 @@ void firm::iterateBellmanVc(vec &Bel, mat &Jac)
             temp<<((*it).second).first<<x.first<<x.second;
             Bel(offset+j) = ((*it).second).second;
             //Vc and Vnc don't affect this map
+            vec Jacpoly;
+            uvec index = EV[i].Jacobian(temp,Jacpoly);
+            rowvec Jactemp = zeros<rowvec>(NEV);
+            Jactemp.elem(index) = beta*Jacpoly;
             Jac.row(offset+j)= zeros<rowvec>(Jac.n_cols);
-            Jac.submat(offset+j, coffset, offset+j, coffset+NEV-1) = beta*EV[i].Jacobian(temp);
+            Jac.submat(offset+j, coffset, offset+j, coffset+NEV-1) =Jactemp;
         }
     }
 }
@@ -217,7 +221,12 @@ void firm::iterateBellmanVnc(vec &Bel, mat &Jac)
             //gain from future choices
             Bel(offset+j) += beta*EV[i].eval(x);
             //Jacobian from the EV[i] f
-            Jac.submat(offset+j, coffset, offset+j, coffset+NEV-1) = beta*EV[i].Jacobian(x);
+            vec Jacpoly;
+            uvec index = EV[i].Jacobian(x,Jacpoly);
+            rowvec Jactemp = zeros<rowvec>(NEV);
+            Jactemp.elem(index) = beta*Jacpoly;
+            Jac.row(offset+j)= zeros<rowvec>(Jac.n_cols);
+            Jac.submat(offset+j, coffset, offset+j, coffset+NEV-1) =Jactemp;
         
         }
     }
@@ -247,6 +256,8 @@ void firm::iterateBellmanEV(vec &Bel, mat &Jac)
             //Computes expected returns
             for(int k=0; k<n_k;k++)
             {
+                rowvec JactempVc = zeros<rowvec>(NVc);
+                rowvec JactempVnc = zeros<rowvec>(NVnc);
                 //sum over epsilon nodes
                 for(int e_i = 0; e_i < N_Qe; e_i++)
                 {
@@ -263,20 +274,24 @@ void firm::iterateBellmanEV(vec &Bel, mat &Jac)
                         //Add to Bellman
                         Bel(offset+j) += Pi_k(i,k)*Vmax*w_e(e_i)*w_u(u_i);
                         //Update Jacobian
+                        vec Jacpoly;
+                        uvec index;
                         if (Vmax == V_c[k].eval(xprime))
                         {
+                            index = V_c[k].Jacobian(xprime, Jacpoly);
+                            JactempVc.elem(index) += Pi_k(i,k)*w_e(e_i)*w_u(u_i)*Jacpoly;
                             //If changing price has larger value
-                            int coffset = k*NVc;
-                            Jac.submat(offset+j, coffset, offset+j, coffset+NVc-1) +=
-                            Pi_k(i,k)*w_e(e_i)*w_u(u_i)*V_c[k].Jacobian(xprime);
                         }else{
+                            index = V_nc[k].Jacobian(xprime, Jacpoly);
+                            JactempVnc.elem(index) +=Pi_k(i,k)*w_e(e_i)*w_u(u_i)*Jacpoly;
                             //If not changing price has larger value
-                            int coffset = n_k*NVc+k*NVnc;
-                            Jac.submat(offset+j, coffset, offset+j, coffset+NVnc-1) +=
-                            Pi_k(i,k)*w_e(e_i)*w_u(u_i)*V_nc[k].Jacobian(xprime);
                         }
                     }
                 }
+                int coffset = k*NVc;
+                Jac.submat(offset+j, coffset, offset+j, coffset+NVc-1) = JactempVc;
+                coffset = n_k*NVc+k*NVnc;
+                Jac.submat(offset+j, coffset, offset+j, coffset+NVnc-1) = JactempVnc;
             }
         }
     }
@@ -291,8 +306,8 @@ pdd firm::findOptimalMu(pdd xin, int k)
     //setup
     x << 0 << xin.first <<xin.second<<endr;
     //initial bounds
-    double alim = exp(-0.05)*gamma/(gamma-1);
-    double blim = exp(0.05)*gamma/(gamma-1);
+    double alim = exp(-0.2)*gamma/(gamma-1);
+    double blim = exp(0.2)*gamma/(gamma-1);
     double a = alim;
     double b = blim;
     double mu1,mu2,f1,f2;
@@ -323,7 +338,7 @@ pdd firm::findOptimalMu(pdd xin, int k)
         cerr<< "Maximization converged to limit!"<<endl;
         exit(1);
     }
-    double temp = getPresentValue(x,k)-kappa(k);
+    double temp = getPresentValue(x,k)-kappa(k)*psi;
     return pdd(x(0),temp);
 }
 
@@ -398,7 +413,7 @@ void firm::setf(const vec &f)
 
 
 
-void firm::getPolicy()
+void firm::computePolicy()
 {
     //iterate over cost states
     for(int i =0; i<n_k; i++)
@@ -419,15 +434,28 @@ void firm::getPolicy()
                 pdd mu = findOptimalMu(x,i);
                 it = cache.insert( std::pair<pdd, pdd>(x,mu) ).first;
             }
-            if (V_c[i].eval(g[i][j]) >= V_nc[i].eval(g[i][j]) ) {
-                g[i].f(j) = (*it).second.first;
-            }else
-            {
-                g[i].f(j) = g[i][j](0);
-            }
+            g[i].f(j) = (*it).second.first;
             
         }
         g[i].fit();
+    }
+}
+
+/*
+ *Computes mu' given x = (mu,g,p_{t-1}) and cost state i;
+ */
+double firm::getPolicy(vec x,int i) const
+{
+    if(V_c[i].eval(x) >= V_nc[i].eval(x))
+    {
+        return g[i].eval(x);
+    }else
+    {
+        if(x(0)>mu_max || x(0)<mu_min)
+            return g[i].eval(x);
+        
+        //return mu if does not change prices.
+        return x(0);
     }
 }
 

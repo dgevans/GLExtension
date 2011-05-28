@@ -36,7 +36,7 @@ public:
     //returns the term matrix
     static const arma::umat& getTermMatrix(){return terms;}
     
-    double evaluate(const arma::vec &x);//evaluates the linear polynomial at (x_1,\ldots x_n)
+    double evaluate(const arma::vec &x) const;//evaluates the linear polynomial at (x_1,\ldots x_n)
     
     //Returns the Jacobian associated with f vector
     arma::rowvec Jacobian(const arma::vec &x) const;
@@ -110,7 +110,7 @@ linearpoly<d>::linearpoly(const arma::mat &ainv):Ainv(ainv) {
  * Evaluates at given point x
  */
 template <int d>
-double linearpoly<d>::evaluate(const arma::vec &x) {
+double linearpoly<d>::evaluate(const arma::vec &x) const{
     arma::mat ret = getTermVector(x)*coef; 
     return ret(0);
 }

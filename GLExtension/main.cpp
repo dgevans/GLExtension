@@ -7,8 +7,7 @@
 //
 
 #include <iostream>
-#include "Firm.h"
-#include "libscl.h"
+#include "Economy.h"
 #include <math.h>
 #include <time.h>
 
@@ -17,6 +16,8 @@ using namespace arma;
 template <int d> arma::umat linearpoly<d>::terms;
 const int firm::d;
 
+void solveBeliefs(economy &econ);
+int seed;
 
 int main (int argc, const char * argv[])
 {
@@ -30,16 +31,30 @@ int main (int argc, const char * argv[])
 
     double param[6] = {psi,beta,var_e,var_u,rho,gamma};
     vec kap;
-    kap << 0.0167<<endr;
+    kap << 0.01<<endr;
     mat pi_k;
     pi_k << 1.0<<endr;
     vec reg;
-    reg << gamma/(1-gamma)<<0.0<<0.0;
-    
+    reg << 0.0139<<-0.6871<< 0.9915;
     linearpoly<firm::d>::constructTerms();
-    firm F( param, kap, pi_k, reg);
-    F.solveBellman();
+    economy econ( param, kap, pi_k, reg);
+    seed = clock();
+    solveBeliefs(econ);
     return 0;
 }
+
+void solveBeliefs(economy &econ)
+{
+    vec creg;
+    int n = 0;
+    while (n<20) {
+        creg = econ.simulateSeries(100, 500, 500000, seed);
+        creg.print("New Beliefs: ");
+        econ.setBeliefs(creg);
+        n++;
+    }
+}
+
+
 
 
