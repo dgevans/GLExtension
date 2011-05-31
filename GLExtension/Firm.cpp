@@ -37,7 +37,7 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     sigma_u = sqrt(var_u);
     rho = param[4];
     gamma = param[5];
-    n_k = kappa.n_cols;
+    n_k = kappa.n_rows;
     
     //Golden search constants
     alpha1 = (3-sqrt(5))/2;
@@ -72,6 +72,9 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     //bounds on mu
     mu_min = exp(e_u.min())*gamma/(gamma-1)*.15;
     mu_max = exp(e_u.max())*gamma/(gamma-1)*2;
+    
+    double mu_mina = exp(e_u.min())*gamma/(gamma-1)*.65;
+    double mu_maxa = exp(e_u.max())*gamma/(gamma-1)*1.35;
     //bounds on g_t
     double g_max = 3*(sigma_e)/sqrt(1-rho*rho);
     double g_min = -3*(sigma_e)/sqrt(1-rho*rho);
@@ -79,7 +82,11 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     double p_max = pbound;
     double p_min = -pbound;
     
-    grid[0] = linspace<vec>(mu_min,mu_max, N_mu);
+    grid[0] = linspace<vec>(mu_min,mu_mina, N_mu/4);
+    grid[0].reshape(grid[0].n_rows-1, 1);
+    grid[0] = join_cols(grid[0], linspace<vec>(mu_mina,mu_maxa, N_mu/2));
+    grid[0].reshape(grid[0].n_rows-1,1);
+    grid[0] = join_cols(grid[0], linspace<vec>(mu_maxa,mu_max,N_mu/4));
     grid[1] = linspace<vec>(g_min,g_max,N_g);
     grid[2] = linspace<vec>(p_min,p_max,N_p);
     
@@ -428,12 +435,14 @@ void firm::computePolicy()
             //Stores the g_t and p_{t-1} associated with node [j] and kappa_i in x
             pdd x = pdd(g[i][j](1),g[i][j](2));
             //check if have allready cached value
+#pragma omp critical
+            {
             it = cache.find(x);
             if (it == cache.end()) {
                 //If not find optimal Mu node doesn't depend on mu today
                 pdd mu = findOptimalMu(x,i);
                 it = cache.insert( std::pair<pdd, pdd>(x,mu) ).first;
-            }
+            }}
             g[i].f(j) = (*it).second.first;
             
         }

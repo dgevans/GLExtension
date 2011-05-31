@@ -25,17 +25,19 @@ class economy {
     //Menu cost process
     arma::vec kappa;
     arma::mat Pi_k;
+    arma::vec Pi_kstat;
     arma::mat cumPi_k;
     int n_k; //number of kappa states
     
     //Beliefs
     arma::vec c_reg;
     
-    
+    int drawDiscrete(const arma::vec &cumDist);
     
 public:
     economy(double param[],const arma::vec &kap, const arma::mat &pi_k, const arma::vec &reg);//Constructor
     arma::vec simulateSeries(int Tburn, int Tmax, int Nfirms, int seed);
+    void storeOutcome(int Tburn, int Tmax, int Nfirms, int seed);
     
     int drawKappa(int i);
     
@@ -46,4 +48,9 @@ inline void economy::setBeliefs(arma::vec creg)
 {
     F.creg() = creg;
     F.solveBellman();
+}
+
+inline int economy::drawKappa(int i)
+{
+    return drawDiscrete(trans(cumPi_k.row(i)));
 }

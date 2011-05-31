@@ -17,6 +17,7 @@ template <int d> arma::umat linearpoly<d>::terms;
 const int firm::d;
 
 void solveBeliefs(economy &econ);
+void rouwenhorst(double rho, double var, double mu, int N, vec &kap, mat &Pi_k);
 int seed;
 
 int main (int argc, const char * argv[])
@@ -30,16 +31,20 @@ int main (int argc, const char * argv[])
     double beta = pow(0.96,1.0/52.0)/exp(pow((gamma-1),2)*var_e/2);
 
     double param[6] = {psi,beta,var_e,var_u,rho,gamma};
+    double kapmu = 0.01667;
+    double kaprho = 0.75;
+    double kapvar = (1-kaprho*kaprho)*.006*.006;
     vec kap;
-    kap << 0.01<<endr;
     mat pi_k;
-    pi_k << 1.0<<endr;
+    rouwenhorst(kaprho, kapvar, kapmu, 3, kap, pi_k);
     vec reg;
     reg << 0.0139<<-0.6871<< 0.9915;
     linearpoly<firm::d>::constructTerms();
     economy econ( param, kap, pi_k, reg);
     seed = clock();
     solveBeliefs(econ);
+    //compute stationary distribution
+
     return 0;
 }
 
@@ -48,7 +53,7 @@ void solveBeliefs(economy &econ)
     vec creg;
     int n = 0;
     while (n<20) {
-        creg = econ.simulateSeries(100, 500, 500000, seed);
+        creg = econ.simulateSeries(100, 500, 100000, clock());
         creg.print("New Beliefs: ");
         econ.setBeliefs(creg);
         n++;
@@ -56,5 +61,30 @@ void solveBeliefs(economy &econ)
 }
 
 
-
+void rouwenhorst(double rho, double var, double mu, int N, vec &kap, mat &pi_k)
+{
+    //set up
+    double p = (1+rho)/2;
+    double q = p;
+    double psi = sqrt(N-1)*sqrt(var);
+    
+    //Compute transition
+    mat theta, thetanew;
+    theta << p << 1-p<<endr
+    << 1-q << q<<endr;
+    for(int n = 3; n<=N; n++)
+    {
+        //Follow algorithm to compute transition
+        thetanew = zeros<mat>(n, n);
+        thetanew.submat(0, 0, n-2,n-2) += p*theta;
+        thetanew.submat(0, 1, n-2, n-1) += (1-p)*theta;
+        thetanew.submat(1, 0, n-1, n-2) += (1-q)*theta;
+        thetanew.submat(1, 1, n-1, n-1) += q*theta;
+        thetanew.rows(1,n-2) /= 2;
+        theta = thetanew;
+    }
+    pi_k = theta;
+    //get states
+    kap = linspace<vec>(-psi, psi, N)+mu;
+}
 
