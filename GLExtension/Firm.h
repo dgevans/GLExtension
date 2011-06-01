@@ -16,8 +16,8 @@ public:
     static const int N_Qu = 40;//number of nodes for quadrature for u shock.
     static const int N_Qe = 20;//number of nodes for quadrature for e shock.
     static const int N_mu = 25;
-    static const int N_g = 8;
-    static const int N_p = 8;
+    static const int N_g = 5;
+    static const int N_p = 5;
     static const double pbound = 0.015;
     static const double maxTol = 1e-7;//Tolerance form maximization
 private:

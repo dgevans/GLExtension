@@ -31,14 +31,14 @@ int main (int argc, const char * argv[])
     double beta = pow(0.96,1.0/52.0)/exp(pow((gamma-1),2)*var_e/2);
 
     double param[6] = {psi,beta,var_e,var_u,rho,gamma};
-    double kapmu = 0.01667;
+    double kapmu = 0.0054;
     double kaprho = 0.95;
-    double kapvar = .006*.006;
+    double kapvar = .003*.003;
     vec kap;
     mat pi_k;
     rouwenhorst(kaprho, kapvar, kapmu, 4, kap, pi_k);
     vec reg;
-    reg << 0.0139<<-0.6871<< 0.9915;
+    reg << 0.015<<-0.5<< 0.91;
     linearpoly<firm::d>::constructTerms();
     kap.print();
     economy econ( param, kap, pi_k, reg);
@@ -53,7 +53,7 @@ void solveBeliefs(economy &econ)
 {
     vec creg;
     int n = 0;
-    while (n<20) {
+    while (n<10) {
         creg = econ.simulateSeries(100, 500, 500000, clock());
         creg.print("New Beliefs: ");
         econ.setBeliefs(creg);
