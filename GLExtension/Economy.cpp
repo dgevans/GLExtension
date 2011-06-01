@@ -66,6 +66,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     g(0) = 0;
     vec p(Tmax+1);//really log p
     p(0) = 0;
+    vec pchange = zeros<vec>(Tmax+1);
     //Run Economy
     for (int t =1; t<Tmax+1; t++) {
         g(t) = rho*g(t-1)+ngen()*sigma_u;
@@ -90,7 +91,10 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
                 mu(j) = F.getPolicy(x, kap(j));
                 if (mu(j) != x(0)) {
 #pragma omp critical
+                    {
                     Fchange(t)++;
+                        pchange(t) += abs(log(mu(j)/x(0)));
+                    }
                 }
                 //add to price
 #pragma omp critical
@@ -99,10 +103,12 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
                 kap(j) = drawKappa(kap(j));
             }
         }
+        pchange(t) /=Fchange(t);
         Fchange(t) /=Nfirms;
         P /= Nfirms;
         //get log P
         p(t) = log(P)/(1-gamma);
+        F.checkPbound(p(t));
         
     }
     
@@ -112,6 +118,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     mat X = join_rows(g.rows(Tburn+2,Tmax), p.rows(Tburn+1,Tmax-1));
     X = join_rows(ones<vec>(n), X);
     cout<<"Average number of changes: "<<accu(Fchange)/(Tmax+1)<<endl;
+    cout<<"Average size of price change: "<<accu(pchange)/(Tmax+1)<<endl;
     return solve(trans(X)*X,trans(X)*y);
 }
 

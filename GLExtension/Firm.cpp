@@ -468,6 +468,12 @@ double firm::getPolicy(vec x,int i) const
     }
 }
 
+void firm::checkPbound(double lnp)
+{
+    if(abs(lnp) > pbound)
+        cout<< "Price into extrapolation region"<<endl;
+}
+
 
 
 

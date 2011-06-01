@@ -89,6 +89,8 @@ public:
     double getPolicy(arma::vec x,int i) const;
     
     arma::vec& creg() {return c_reg;};
+    
+    void checkPbound(double lnp);
 };
 
 
