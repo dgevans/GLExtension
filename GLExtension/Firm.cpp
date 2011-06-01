@@ -312,8 +312,8 @@ pdd firm::findOptimalMu(pdd xin, int k)
     //setup
     x << 0 << xin.first <<xin.second<<endr;
     //initial bounds
-    double alim = exp(-0.2)*gamma/(gamma-1);
-    double blim = exp(0.2)*gamma/(gamma-1);
+    double alim = mu_min;
+    double blim = mu_max;
     double a = alim;
     double b = blim;
     double mu1,mu2,f1,f2;
