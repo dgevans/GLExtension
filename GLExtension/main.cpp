@@ -26,20 +26,21 @@ int main (int argc, const char * argv[])
     double psi = 1;
     double rho = pow(0.61,0.25);
     double var_e = 0.0231*0.0231;
-    double var_u = sqrt(0.0018*0.0018/( (1+pow(rho,6))+(1+pow(rho,4))*pow((1+rho),2)+(1+pow(rho,2))*pow((1+rho+rho*rho),2)+pow((1+rho+rho*rho+rho*rho*rho),2)));
+    double var_u = 0.0018*0.0018/( (1+pow(rho,6))+(1+pow(rho,4))*pow((1+rho),2)+(1+pow(rho,2))*pow((1+rho+rho*rho),2)+pow((1+rho+rho*rho+rho*rho*rho),2));
     double gamma = 3;
     double beta = pow(0.96,1.0/52.0)/exp(pow((gamma-1),2)*var_e/2);
 
     double param[6] = {psi,beta,var_e,var_u,rho,gamma};
     double kapmu = 0.01667;
-    double kaprho = 0.75;
-    double kapvar = (1-kaprho*kaprho)*.006*.006;
+    double kaprho = 0.95;
+    double kapvar = .006*.006;
     vec kap;
     mat pi_k;
-    rouwenhorst(kaprho, kapvar, kapmu, 3, kap, pi_k);
+    rouwenhorst(kaprho, kapvar, kapmu, 4, kap, pi_k);
     vec reg;
     reg << 0.0139<<-0.6871<< 0.9915;
     linearpoly<firm::d>::constructTerms();
+    kap.print();
     economy econ( param, kap, pi_k, reg);
     seed = clock();
     solveBeliefs(econ);
@@ -53,7 +54,7 @@ void solveBeliefs(economy &econ)
     vec creg;
     int n = 0;
     while (n<20) {
-        creg = econ.simulateSeries(100, 500, 100000, clock());
+        creg = econ.simulateSeries(100, 500, 500000, clock());
         creg.print("New Beliefs: ");
         econ.setBeliefs(creg);
         n++;
