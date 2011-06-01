@@ -79,8 +79,8 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     double g_max = 3*(sigma_e)/sqrt(1-rho*rho);
     double g_min = -3*(sigma_e)/sqrt(1-rho*rho);
     //bounds on log p_{t-1}
-    double p_max = pbound;
-    double p_min = -pbound;
+    double p_max = log(mu_maxa);
+    double p_min = log(mu_mina);
     
     grid[0] = linspace<vec>(mu_min,mu_mina, N_mu/4);
     grid[0].reshape(grid[0].n_rows-1, 1);
