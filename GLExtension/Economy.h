@@ -54,3 +54,4 @@ inline int economy::drawKappa(int i)
 {
     return drawDiscrete(trans(cumPi_k.row(i)));
 }
+

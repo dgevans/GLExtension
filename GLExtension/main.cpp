@@ -88,3 +88,4 @@ void rouwenhorst(double rho, double var, double mu, int N, vec &kap, mat &pi_k)
     kap = linspace<vec>(-psi, psi, N)+mu;
 }
 
+
