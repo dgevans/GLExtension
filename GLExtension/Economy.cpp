@@ -93,7 +93,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
 #pragma omp critical
                     {
                         Fchange(t)++;
-                        pchange(t) += abs( std::log(mu(j)/x(0)) );
+                        pchange(t) += std::abs( std::log(mu(j)/x(0)) );
                     }
                 }
                 //add to price
