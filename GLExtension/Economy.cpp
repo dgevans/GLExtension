@@ -45,6 +45,7 @@ economy::economy(double param[],const arma::vec &kap, const arma::mat &pi_k, con
  */
 vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
 {
+    cout<<"Simulating: "<<endl;
     gen.seed(seed);
     boost::normal_distribution<> ndist(0.0,1.0);
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > ngen(gen, ndist);
@@ -70,6 +71,8 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
         g(t) = rho*g(t-1)+ngen()*sigma_u;
         M(t) = M(t-1)+exp(g(t));
         double P;
+        if (t%50 ==0)
+            cout<< t<<endl;
         //remember private x when parallelizing.
 #pragma omp parallel
         {
