@@ -13,7 +13,6 @@
 #include <time.h>
 #include <omp.h>
 
-const double firm::pbound;
 const double firm::maxTol;
 template <int d> arma::umat linearpoly<d>::terms;
 
@@ -79,8 +78,8 @@ firm::firm(double param[],const arma::vec &kap, const arma::mat &pi_k, const arm
     double g_max = 3*(sigma_e)/sqrt(1-rho*rho);
     double g_min = -3*(sigma_e)/sqrt(1-rho*rho);
     //bounds on log p_{t-1}
-    double p_max = log(mu_maxa);
-    double p_min = log(mu_mina);
+    p_max = log(mu_maxa);
+    p_min = log(mu_mina);
     
     grid[0] = linspace<vec>(mu_min,mu_mina, N_mu/4);
     grid[0].reshape(grid[0].n_rows-1, 1);
@@ -470,8 +469,8 @@ double firm::getPolicy(vec x,int i) const
 
 void firm::checkPbound(double lnp)
 {
-    if(abs(lnp) > pbound)
-        cout<< "Price into extrapolation region"<<endl;
+    if((lnp > p_max) || (lnp < p_min))
+        cout<< "Price outside of ["<<p_min<<","<<p_max<<"]: "<<lnp<<endl;
 }
 
 
