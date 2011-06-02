@@ -31,7 +31,7 @@ int main (int argc, const char * argv[])
     double beta = pow(0.96,1.0/52.0)/exp(pow((gamma-1),2)*var_e/2);
 
     double param[6] = {psi,beta,var_e,var_u,rho,gamma};
-    double kapmu = 0.01;
+    double kapmu = 0.006;
     double kaprho = 0.95;
     double kapvar = .003*.003;
     vec kap;
@@ -47,6 +47,7 @@ int main (int argc, const char * argv[])
     }
     linearpoly<firm::d>::constructTerms();
     reg.print();
+    kap.print();
     economy econ( param, kap, pi_k, reg);
     seed = clock();
     solveBeliefs(econ);
@@ -59,13 +60,14 @@ void solveBeliefs(economy &econ)
 {
     vec creg;
     int n = 0;
-    while (n<10) {
+    while (n<3) {
         creg = econ.simulateSeries(100, 500, 500000, clock());
         creg.print("New Beliefs: ");
         econ.setBeliefs(creg);
         creg.save("creg.mat");
         n++;
     }
+    econ.storeOutcome(100, 500, 500000, clock());
 }
 
 
