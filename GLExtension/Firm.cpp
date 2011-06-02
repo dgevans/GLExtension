@@ -342,7 +342,7 @@ pdd firm::findOptimalMu(pdd xin, int k)
     if((abs(alim-x(0)) < maxTol)||(abs(blim-x(0)) < maxTol))
     {
         cerr<< "Maximization converged to limit!"<<endl;
-        exit(1);
+       // exit(1);
     }
     double temp = getPresentValue(x,k)-kappa(k)*psi;
     return pdd(x(0),temp);
