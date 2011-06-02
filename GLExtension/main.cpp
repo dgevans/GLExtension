@@ -67,7 +67,10 @@ void solveBeliefs(economy &econ)
         creg.save("creg.mat");
         n++;
     }
-    econ.storeOutcome(100, 500, 500000, clock());
+    seed = clock();
+    econ.storeOutcome(100, 500, 500000, seed,0.0125);
+    econ.storeOutcome(100, 500, 500000, seed,0.0);
+    
 }
 
 

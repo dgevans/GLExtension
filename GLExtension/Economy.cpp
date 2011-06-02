@@ -76,10 +76,13 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     p(0) = as_scalar(mean(pow(mu, 1-gamma)));
     p(0) = log(p(0))/(1-gamma);
     vec pchange = zeros<vec>(Tmax+1);
+    vec pchangestd = zeros<vec>(Tmax+1);
+    vec pchangestate;
     //Run Economy
     for (int t =1; t<Tmax+1; t++) {
         g(t) = rho*g(t-1)+ngen()*sigma_u;
         M(t) = M(t-1)+exp(g(t));
+        pchangestate = zeros<vec>(Nfirms);
         double P;
         if (t%50 ==0)
             cout<< t<<endl;
@@ -102,8 +105,9 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
 #pragma omp critical
                     {
                         Fchange(t)++;
-                        pchange(t) += std::abs( std::log(mu(j)/x(0)) );
+                        //pchange(t) += std::abs( std::log(mu(j)/x(0)) );
                     }
+                    pchangestate(j) =std::log(mu(j)/x(0));
                 }
                 //add to price
 #pragma omp critical
@@ -112,7 +116,8 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
                 kap(j) = drawKappa(kap(j));
             }
         }
-        pchange(t) /=Fchange(t);
+        pchange(t) = (mean(vec(abs(pchangestate)))*Nfirms)/Fchange(t);
+        pchangestd(t) = stddev(pchangestate,1)*sqrt(Nfirms)/sqrt(Fchange(t));
         Fchange(t) /=Nfirms;
         P /= Nfirms;
         //get log P
@@ -128,6 +133,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     X = join_rows(ones<vec>(n), X);
     cout<<"Average number of changes: "<<mean(Fchange.rows(Tburn+1, Tmax))<<endl;
     cout<<"Average size of price change: "<<mean(pchange.rows(Tburn+1,Tmax))<<endl;
+    cout<<"Average std of price changes:  "<<mean(pchangestd.rows(Tburn+1,Tmax))<<endl;
     mu.save("mu.mat");
     return solve(trans(X)*X,trans(X)*y);
 }
@@ -135,7 +141,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
 /*
  *Simulate the economy Tmax number of periods for Nfirms firms.
  */
-void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed)
+void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double shock)
 {
     gen.seed(seed);
     boost::normal_distribution<> ndist(0.0,1.0);
@@ -163,8 +169,15 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed)
     //Run Economy
     for (int t =1; t<Tmax+1; t++) {
         g(t) = rho*g(t-1)+ngen()*sigma_u;
-        M(t) = M(t-1)+exp(g(t));
+        M(t) = M(t-1)*exp(g(t));
         double P;
+        //Apply monetary shock for impulse response
+        if (t == Tburn) {
+            mu /= 1+shock;
+            M(t) *=1+shock;
+        }
+        if( t%50 == 0)
+            cout<<t<<endl;
         //remember private x when parallelizing.
 #pragma omp parallel
         {
@@ -209,11 +222,25 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed)
     vec belief =  solve(trans(X)*X,trans(X)*y);
     
     //Save results
-    muhist.save("muhist.mat",raw_ascii);
-    ahist.save("ahist.mat",raw_ascii);
-    p.save("p.mat",raw_ascii);
-    g.save("g.mat",raw_ascii);
-    M.save("M.mat",raw_ascii);
+    std::stringstream name;
+    name << "muhist" << shock <<".mat";
+    muhist.save(name.str(),raw_ascii);
+    name.str("");
+    
+    name << "ahist" << shock <<".mat";
+    ahist.save(name.str(),raw_ascii);
+    name.str("");
+    
+    name << "p" << shock <<".mat";
+    p.save(name.str(),raw_ascii);
+    name.str("");
+    
+    name << "g" << shock <<".mat";
+    g.save(name.str(),raw_ascii);
+    name.str("");
+    
+    name << "M" << shock <<".mat";
+    M.save(name.str(),raw_ascii);
 }
 
 /*
