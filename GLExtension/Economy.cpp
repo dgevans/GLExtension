@@ -209,7 +209,11 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed)
     vec belief =  solve(trans(X)*X,trans(X)*y);
     
     //Save results
-
+    muhist.save("muhist.mat",raw_ascii);
+    ahist.save("ahist.mat",raw_ascii);
+    p.save("p.mat",raw_ascii);
+    g.save("g.mat",raw_ascii);
+    M.save("M.mat",raw_ascii);
 }
 
 /*
