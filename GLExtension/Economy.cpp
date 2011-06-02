@@ -50,7 +50,15 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     boost::normal_distribution<> ndist(0.0,1.0);
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > ngen(gen, ndist);
     //Initialize;
-    vec mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+    vec mu;
+    if(mu.load("mu.mat"))
+    {
+        if(mu.n_rows != Nfirms ){
+            mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+        }
+    }else{
+        mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+    }
     
     //Set up initial fixed cost distribution.
     vec cumStatDist = join_cols(zeros<vec>(1), cumsum(Pi_kstat)); 
@@ -65,7 +73,8 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     vec g(Tmax+1);
     g(0) = 0;
     vec p(Tmax+1);//really log p
-    p(0) = 0;
+    p(0) = as_scalar(mean(pow(mu, 1-gamma)));
+    p(0) = log(p(0))/(1-gamma);
     vec pchange = zeros<vec>(Tmax+1);
     //Run Economy
     for (int t =1; t<Tmax+1; t++) {
@@ -117,8 +126,9 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
     vec y = p.rows(Tburn+2, Tmax);
     mat X = join_rows(g.rows(Tburn+2,Tmax), p.rows(Tburn+1,Tmax-1));
     X = join_rows(ones<vec>(n), X);
-    cout<<"Average number of changes: "<<accu(Fchange)/(Tmax+1)<<endl;
-    cout<<"Average size of price change: "<<accu(pchange)/(Tmax+1)<<endl;
+    cout<<"Average number of changes: "<<mean(Fchange.rows(Tburn+1, Tmax))<<endl;
+    cout<<"Average size of price change: "<<mean(pchange.rows(Tburn+1,Tmax))<<endl;
+    mu.save("mu.mat");
     return solve(trans(X)*X,trans(X)*y);
 }
 
