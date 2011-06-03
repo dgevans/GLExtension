@@ -223,23 +223,23 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
     
     //Save results
     std::stringstream name;
-    name << "muhist" << shock <<".mat";
+    name << "/scratch/dge218/muhist" << shock <<".mat";
     muhist.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "ahist" << shock <<".mat";
+    name << "/scratch/dge218/ahist" << shock <<".mat";
     ahist.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "p" << shock <<".mat";
+    name << "/scratch/dge218/p" << shock <<".mat";
     p.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "g" << shock <<".mat";
+    name << "/scratch/dge218/g" << shock <<".mat";
     g.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "M" << shock <<".mat";
+    name << "/scratch/dge218/M" << shock <<".mat";
     M.save(name.str(),raw_ascii);
 }
 
