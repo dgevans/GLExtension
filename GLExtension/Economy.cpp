@@ -147,7 +147,15 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
     boost::normal_distribution<> ndist(0.0,1.0);
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > ngen(gen, ndist);
     //Initialize;
-    vec mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+    vec mu;
+    if(mu.load("mu.mat"))
+    {
+        if(mu.n_rows != Nfirms ){
+            mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+        }
+    }else{
+        mu = gamma/(gamma-1)*ones<vec>(Nfirms,1);
+    }
     mat muhist(Nfirms,Tmax+1);
     mat ahist(Nfirms,Tmax+1);
     ahist.col(0) = ones<vec>(Nfirms);
@@ -166,6 +174,7 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
     g(0) = 0;
     vec p(Tmax+1);//really log p
     p(0) = 0;
+    vec ea(Nfirms);
     //Run Economy
     for (int t =1; t<Tmax+1; t++) {
         g(t) = rho*g(t-1)+ngen()*sigma_u;
@@ -176,6 +185,10 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
             mu /= 1+shock;
             M(t) *=1+shock;
         }
+        for (int j =0; j<Nfirms; j++) 
+        {
+            ea(j) = ngen()*sigma_e;
+        }
         if( t%50 == 0)
             cout<<t<<endl;
         //remember private x when parallelizing.
@@ -185,13 +198,10 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
             x << 0.0 <<g(t) <<p(t-1)<<endr;
 #pragma omp for
             for (int j =0; j<Nfirms; j++) {
-                double ea;
-#pragma omp critical
-                ea = ngen()*sigma_e;
                 
-                ahist(j,t) = ahist(j,t-1)*exp(ea);
+                ahist(j,t) = ahist(j,t-1)*exp(ea(j));
                 //update mu
-                x(0) = mu(j)/exp(g(t)+ea);
+                x(0) = mu(j)/exp(g(t)+ea(j));
                 //get new mu
                 mu(j) = F.getPolicy(x, kap(j));
                 if (mu(j) != x(0)) {
@@ -202,8 +212,12 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
 #pragma omp critical
                 P += pow(mu(j),1-gamma);
                 //get new kappa
-                kap(j) = drawKappa(kap(j));
+                
             }
+        }
+        for(int j=0;j<Nfirms;j++)
+        {
+            kap(j) = drawKappa(kap(j));
         }
         muhist.col(t) = mu;
         Fchange(t) /=Nfirms;
@@ -241,6 +255,11 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
     
     name << "/scratch/dge218/M" << ver <<".mat";
     M.save(name.str(),raw_ascii);
+    name.str("");
+    
+    name << "/scratch/dge218/pchange" << ver <<".mat";
+    Fchange.save(name.str(),raw_ascii);
+    name.str("");
 }
 
 /*
