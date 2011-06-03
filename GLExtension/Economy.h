@@ -37,7 +37,7 @@ class economy {
 public:
     economy(double param[],const arma::vec &kap, const arma::mat &pi_k, const arma::vec &reg);//Constructor
     arma::vec simulateSeries(int Tburn, int Tmax, int Nfirms, int seed);
-    void storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double shock);
+    void storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double shock, int ver);
     
     int drawKappa(int i);
     

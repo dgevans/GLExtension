@@ -141,7 +141,7 @@ vec economy::simulateSeries(int Tburn, int Tmax, int Nfirms, int seed)
 /*
  *Simulate the economy Tmax number of periods for Nfirms firms.
  */
-void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double shock)
+void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double shock,int ver)
 {
     gen.seed(seed);
     boost::normal_distribution<> ndist(0.0,1.0);
@@ -223,23 +223,23 @@ void economy::storeOutcome(int Tburn, int Tmax, int Nfirms, int seed, double sho
     
     //Save results
     std::stringstream name;
-    name << "/scratch/dge218/muhist" << shock <<".mat";
+    name << "/scratch/dge218/muhist" << ver <<".mat";
     muhist.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "/scratch/dge218/ahist" << shock <<".mat";
+    name << "/scratch/dge218/ahist" << ver <<".mat";
     ahist.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "/scratch/dge218/p" << shock <<".mat";
+    name << "/scratch/dge218/p" << ver <<".mat";
     p.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "/scratch/dge218/g" << shock <<".mat";
+    name << "/scratch/dge218/g" << ver <<".mat";
     g.save(name.str(),raw_ascii);
     name.str("");
     
-    name << "/scratch/dge218/M" << shock <<".mat";
+    name << "/scratch/dge218/M" << ver <<".mat";
     M.save(name.str(),raw_ascii);
 }
 

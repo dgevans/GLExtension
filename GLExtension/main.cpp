@@ -68,8 +68,8 @@ void solveBeliefs(economy &econ)
         n++;
     }
     seed = clock();
-    econ.storeOutcome(100, 500, 500000, seed,0.0125);
-    econ.storeOutcome(100, 500, 500000, seed,0.0);
+    econ.storeOutcome(100, 500, 500000, seed,0.0125,0);
+    econ.storeOutcome(100, 500, 500000, seed,0.0,1);
     
 }
 
